@@ -216,7 +216,7 @@ def execute_ddl_from_file(filename, cnx):
     messages = []
     errors = []
 
-    with open(filename, 'r') as file:
+    with open(filename, 'r', encoding='utf-8') as file:
         ddl_commands = file.read()
 
     # Split commands if needed, such as if commands are separated by semicolons

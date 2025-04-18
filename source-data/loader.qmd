@@ -80,6 +80,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
+
 # modify config_map to reflect credentials needed by this program
 config_map = {
     'user':'CMSC408_admin_user',
@@ -91,7 +92,12 @@ config_map = {
 load_dotenv()
 config = {}
 for key in config_map.keys():
+
     config[key] = os.getenv(config_map[key])
+
+    # //i edited this
+    print(f"{config_map[key]}: {value}")
+
 flag = False
 for param in config.keys():
     if config[param] is None:
