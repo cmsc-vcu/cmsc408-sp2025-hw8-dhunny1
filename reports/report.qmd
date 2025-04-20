@@ -376,8 +376,7 @@ SELECT
     COALESCE(Region, 'No Region') AS Region,
     CAST(SUM(CASE WHEN `Income Group` = 'High income' THEN 1 ELSE 0 END) AS DECIMAL(10,1)) AS `High income`,
     CAST(SUM(CASE WHEN `Income Group` = 'Upper middle income' THEN 1 ELSE 0 END) AS DECIMAL(10,1)) AS `Upper middle income`,
-    CAST(SUM(CASE WHEN `Income Group` = 'Lower middle income' THEN 1 ELSE 0 END) AS DECIMAL(10,1)) AS `Lower middle income`,
-    CAST(SUM(CASE WHEN `Income Group` = 'Low income' THEN 1 ELSE 0 END) AS DECIMAL(10,1)) AS `Low income`,
+    CAST(SUM(CASE WHEN `Income Group` = 'Lower middle income' THEN 1 ELSE 0 END) AS DECIMAL(10,1)) AS `Lower middle income`,    
     CAST(COUNT(*) AS DECIMAL(10,1)) AS Total
 FROM
     wdi_country
