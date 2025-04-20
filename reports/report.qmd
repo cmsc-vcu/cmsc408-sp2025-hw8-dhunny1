@@ -92,11 +92,11 @@ List all non-countries.
 
 run_sql_and_return_html(cnx,"""
 SELECT
-  `Long Name`, `Region`
+  `Country Code`,`Short Name`,`Long Name`, `Region`
 From
   world_bank_data.wdi_country
 WHERE
-   region is NULL
+   `Region` IS NULL
 """)
 ```
 
@@ -230,7 +230,7 @@ ORDER BY
 
 run_sql_and_return_html(cnx,"""
 select
-  `Long Name`, `Region`
+  `Region`, `Short Name`, `Long Name`
 from
   wdi_country
 where
@@ -289,7 +289,7 @@ group by
 
 run_sql_and_return_html(cnx,"""
 select
-  `Short Name`, `Income Group`, `Country Code`, `Long Name`
+  `Short Name`, `Long Name` , `Income Group`
 from
   wdi_country
 where
@@ -308,9 +308,11 @@ where
 ## NOTE - if you get this wrong, all subsequent tables will be wrong!
 
 execute_ddl(cnx, """
+START TRANSACTION;
 UPDATE wdi_country
 SET `Income Group` = 'High income'
 WHERE `Country Code` = 'VEN';
+commit;
 """)
 
 
@@ -319,9 +321,12 @@ WHERE `Country Code` = 'VEN';
 ## Now, display the country again to verify the change stuck!
 
 run_sql_and_return_html(cnx, """
-SELECT `Income Group`, count(*)
-FROM wdi_country
-GROUP BY `Income Group`;
+select
+  `Short Name`, `Long Name` , `Income Group`
+from
+  wdi_country
+where
+  `Country Code` = 'VEN'
 """)
 
 ```
