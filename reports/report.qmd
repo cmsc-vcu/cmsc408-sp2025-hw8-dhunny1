@@ -92,7 +92,7 @@ List all non-countries.
 
 run_sql_and_return_html(cnx,"""
 SELECT
-  `Country Code`,`Short Name`,`Long Name`, `Region`
+  `Short Name`
 From
   world_bank_data.wdi_country
 WHERE
@@ -249,7 +249,7 @@ where
 
 run_sql_and_return_html(cnx,"""
 select 
-  `Long Name`, `2-alpha code`, `WB-2 code`, `Region`
+  `Country Code`, `Short Name`,  `2-alpha code`, `WB-2 code`, `Region`
 from
   wdi_country
 where
@@ -373,7 +373,7 @@ ORDER BY
 
 run_sql_and_return_html(cnx,"""
 SELECT
-    Region,
+    COALESCE(Region, 'No Region') AS Region,
     SUM(CASE WHEN `Income Group` = 'High income' THEN 1 ELSE 0 END) AS `High income`,
     SUM(CASE WHEN `Income Group` = 'Upper middle income' THEN 1 ELSE 0 END) AS `Upper middle income`,
     SUM(CASE WHEN `Income Group` = 'Lower middle income' THEN 1 ELSE 0 END) AS `Lower middle income`,
@@ -387,6 +387,7 @@ GROUP BY
 ORDER BY
     Region;
 """)
+
 
 ```
 
@@ -416,7 +417,7 @@ WHERE
 GROUP BY
     Region
 ORDER BY
-    "Number of Low Income Countries" DESC
+    COUNT(*) DESC
 LIMIT 1;
 """)
 
@@ -449,6 +450,7 @@ ORDER BY
     `Short Name`;
 """)
 
+
 ```
 
 ## Task 18
@@ -473,7 +475,11 @@ ORDER BY
 run_sql_and_return_html(cnx,"""
 SELECT
     r.Region,
-    i.`Income Group`
+    i.`Income Group`,
+    CASE
+        WHEN existing_pairs.Region IS NULL THEN 'Missing'
+        ELSE 'Present'
+    END AS `Status`
 FROM
     (SELECT DISTINCT Region FROM wdi_country) AS r
 CROSS JOIN
@@ -482,8 +488,11 @@ LEFT JOIN
     (SELECT Region, `Income Group` FROM wdi_country GROUP BY Region, `Income Group`) AS existing_pairs
     ON r.Region = existing_pairs.Region AND i.`Income Group` = existing_pairs.`Income Group`
 WHERE
-    existing_pairs.Region IS NULL;
+    existing_pairs.Region IS NULL
+ORDER BY
+    r.Region, i.`Income Group`;
 """)
+
 
 ```
 
@@ -571,20 +580,19 @@ ORDER BY
 ## columns, Region in the rows and Percent of total in each cell of the table.
 
 run_sql_and_return_html(cnx,"""
-WITH Task19Result AS (
-    -- Include the Task 19 query here
-    WITH RegionIncomeCounts AS (
-        SELECT
-            Region,
-            `Income Group`,
-            COUNT(*) AS CountryCount,
-            (SELECT COUNT(*) FROM wdi_country) AS TotalCountries
-        FROM
-            wdi_country
-        GROUP BY
-            Region,
-            `Income Group`
-    )
+WITH RegionIncomeCounts AS (
+    SELECT
+        Region,
+        `Income Group`,
+        COUNT(*) AS CountryCount,
+        (SELECT COUNT(*) FROM wdi_country) AS TotalCountries
+    FROM
+        wdi_country
+    GROUP BY
+        Region,
+        `Income Group`
+),
+Task19Result AS (
     SELECT
         Region,
         `Income Group`,
@@ -600,7 +608,7 @@ SELECT
     SUM(CASE WHEN `Income Group` = 'Lower middle income' THEN PercentageOfTotal ELSE 0 END) AS `Lower middle income`,
     SUM(CASE WHEN `Income Group` = 'Low income' THEN PercentageOfTotal ELSE 0 END) AS `Low income`,
     SUM(CASE WHEN `Income Group` IS NULL THEN PercentageOfTotal ELSE 0 END) AS `No Income Group`,
-    SUM(PercentageOfTotal) AS TotalPercentage
+    SUM(PercentageOfTotal) AS `Total Percentage`
 FROM
     Task19Result
 GROUP BY
@@ -608,7 +616,6 @@ GROUP BY
 ORDER BY
     Region;
 """)
-
 ```
 
 ## Task 21
@@ -619,7 +626,6 @@ ORDER BY
 ## by income category.
 
 ## (This is much simpler than task 20!)
-
 run_sql_and_return_html(cnx,"""
 WITH IncomeCounts AS (
     SELECT
@@ -638,7 +644,7 @@ SELECT
     ic.`Income Group`,
     ic.NumberOfCountries,
     ot.TotalCountries,
-    (ic.NumberOfCountries * 100.0 / ot.TotalCountries) AS PercentageOfTotal
+    ROUND((ic.NumberOfCountries * 100.0 / ot.TotalCountries), 1) AS PercentageOfTotal
 FROM
     IncomeCounts ic
 CROSS JOIN
@@ -646,9 +652,7 @@ CROSS JOIN
 ORDER BY
     ic.`Income Group`;
 """)
-
 ```
-
 
 # Reflection
 
