@@ -389,6 +389,7 @@ ORDER BY
 """)
 
 
+
 ```
 
 ## Task 16
@@ -445,10 +446,11 @@ FROM
 WHERE
     Region = (SELECT Region FROM wdi_country WHERE `Country Code` = 'MHL')
     AND `Income Group` = (SELECT `Income Group` FROM wdi_country WHERE `Country Code` = 'MHL')
-    AND `Country Code` != 'MHL' -- Exclude the Marshall Islands themselves
+    AND `Country Code` != 'MHL' -- Exclude the Marshall Islands
 ORDER BY
     `Short Name`;
 """)
+
 
 
 ```
@@ -602,13 +604,12 @@ Task19Result AS (
         RegionIncomeCounts
 )
 SELECT
-    Region,
+    COALESCE(Region, 'No Region') AS Region,
     SUM(CASE WHEN `Income Group` = 'High income' THEN PercentageOfTotal ELSE 0 END) AS `High income`,
     SUM(CASE WHEN `Income Group` = 'Upper middle income' THEN PercentageOfTotal ELSE 0 END) AS `Upper middle income`,
     SUM(CASE WHEN `Income Group` = 'Lower middle income' THEN PercentageOfTotal ELSE 0 END) AS `Lower middle income`,
     SUM(CASE WHEN `Income Group` = 'Low income' THEN PercentageOfTotal ELSE 0 END) AS `Low income`,
-    SUM(CASE WHEN `Income Group` IS NULL THEN PercentageOfTotal ELSE 0 END) AS `No Income Group`,
-    SUM(PercentageOfTotal) AS `Total Percentage`
+    SUM(CASE WHEN `Income Group` IS NULL THEN PercentageOfTotal ELSE 0 END) AS `No Income Group`
 FROM
     Task19Result
 GROUP BY
@@ -616,6 +617,7 @@ GROUP BY
 ORDER BY
     Region;
 """)
+
 ```
 
 ## Task 21
