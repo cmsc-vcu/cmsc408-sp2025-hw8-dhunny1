@@ -374,11 +374,11 @@ ORDER BY
 run_sql_and_return_html(cnx,"""
 SELECT
     COALESCE(Region, 'No Region') AS Region,
-    CAST(SUM(CASE WHEN `Income Group` = 'High income' THEN 1 ELSE 0 END) AS UNSIGNED) AS `High income`,
-    CAST(SUM(CASE WHEN `Income Group` = 'Upper middle income' THEN 1 ELSE 0 END) AS UNSIGNED) AS `Upper middle income`,
-    CAST(SUM(CASE WHEN `Income Group` = 'Lower middle income' THEN 1 ELSE 0 END) AS UNSIGNED) AS `Lower middle income`,
-    CAST(SUM(CASE WHEN `Income Group` = 'Low income' THEN 1 ELSE 0 END) AS UNSIGNED) AS `Low income`,
-    CAST(SUM(CASE WHEN `Income Group` IS NULL THEN 1 ELSE 0 END) AS UNSIGNED) AS `No Income Group`,
+    CAST(SUM(CASE WHEN `Income Group` = 'High income' THEN 1 ELSE 0 END) AS DECIMAL(10,1)) AS `High income`,
+    CAST(SUM(CASE WHEN `Income Group` = 'Upper middle income' THEN 1 ELSE 0 END) AS DECIMAL(10,1)) AS `Upper middle income`,
+    CAST(SUM(CASE WHEN `Income Group` = 'Lower middle income' THEN 1 ELSE 0 END) AS DECIMAL(10,1)) AS `Lower middle income`,
+    CAST(SUM(CASE WHEN `Income Group` = 'Low income' THEN 1 ELSE 0 END) AS DECIMAL(10,1)) AS `Low income`,
+    CAST(SUM(CASE WHEN `Income Group` IS NULL THEN 1 ELSE 0 END) AS DECIMAL(10,1)) AS `No Income Group`,
     CAST(COUNT(*) AS DECIMAL(10,1)) AS Total
 FROM
     wdi_country
@@ -387,6 +387,7 @@ GROUP BY
 ORDER BY
     Region;
 """)
+
 
 
 
